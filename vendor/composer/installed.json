@@ -2,29 +2,29 @@
         "packages": [
                 {
                         "name": "om/icalparser",
-                        "version": "v3.1.0",
-                        "version_normalized": "3.1.0.0",
+                        "version": "v3.0.4",
+                        "version_normalized": "3.0.4.0",
                         "source": {
                                 "type": "git",
                                 "url": "https://github.com/OzzyCzech/icalparser.git",
-                                "reference": "5830e952f9b72d8a8014582fab036d9c19ed22f9"
+                                "reference": "b488bf4cfebed31b6b2263195ecb1ed783c2acfd"
                         },
                         "dist": {
                                 "type": "zip",
-                                "url": "https://api.github.com/repos/OzzyCzech/icalparser/zipball/5830e952f9b72d8a8014582fab036d9c19ed22f9",
-                                "reference": "5830e952f9b72d8a8014582fab036d9c19ed22f9",
+                                "url": "https://api.github.com/repos/OzzyCzech/icalparser/zipball/b488bf4cfebed31b6b2263195ecb1ed783c2acfd",
+                                "reference": "b488bf4cfebed31b6b2263195ecb1ed783c2acfd",
                                 "shasum": ""
                         },
                         "require": {
-                                "php": ">=8.1.0"
+                                "php": ">=7.4.0"
                         },
                         "require-dev": {
-                                "nette/tester": "^2.5.1"
+                                "nette/tester": "^2.4"
                         },
                         "suggest": {
                                 "ext-dom": "for timezone tool"
                         },
-                        "time": "2023-12-12T09:47:00+00:00",
+                        "time": "2022-09-19T07:05:22+00:00",
                         "type": "library",
                         "installation-source": "dist",
                         "autoload": {
@@ -42,7 +42,7 @@
                                         "email": "roman@ozana.cz"
                                 }
                         ],
-                        "description": "Simple iCal parser",
+                        "description": "Simple ical parser",
                         "keywords": [
                                 "calendar",
                                 "ical",
@@ -50,7 +50,7 @@
                         ],
                         "support": {
                                 "issues": "https://github.com/OzzyCzech/icalparser/issues",
-                                "source": "https://github.com/OzzyCzech/icalparser/tree/v3.1.0"
+                                "source": "https://github.com/OzzyCzech/icalparser/tree/v3.0.4"
                         },
                         "install-path": "../om/icalparser"
                 }

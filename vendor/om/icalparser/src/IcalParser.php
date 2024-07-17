@@ -2,7 +2,6 @@
 
 namespace om;
 
-use ArrayObject;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -28,7 +27,7 @@ class IcalParser {
 	protected array $counters = [];
 
 	/** @var array */
-	private array $windowsTimezones;
+	private $windowsTimezones;
 
 	public function __construct() {
 		$this->windowsTimezones = require __DIR__ . '/WindowsTimezones.php'; // load Windows timezones from separate file
@@ -40,9 +39,9 @@ class IcalParser {
 	 * @return array|null
 	 * @throws Exception
 	 */
-	public function parseFile(string $file, callable $callback = null): ?array {
+	public function parseFile(string $file, callable $callback = null): array {
 		if (!$handle = fopen($file, 'rb')) {
-			throw new RuntimeException('Can\'t open file' . $file . ' for reading.');
+			throw new RuntimeException('Can\'t open file' . $file . ' for reading');
 		}
 		fclose($handle);
 
@@ -63,7 +62,7 @@ class IcalParser {
 			$this->counters = [];
 		}
 
-		if (!str_contains($string, 'BEGIN:VCALENDAR')) {
+		if (!preg_match('/BEGIN:VCALENDAR/', $string)) {
 			throw new InvalidArgumentException('Invalid ICAL data format');
 		}
 
@@ -148,7 +147,7 @@ class IcalParser {
 
 					if ($this->isMultipleKeyWithCommaSeparation($key)) {
 
-						if (str_contains($value, ',')) {
+						if (strpos($value, ',') !== false) {
 							$values = array_map('trim', preg_split('/(?<![^\\\\]\\\\),/', $value));
 						} else {
 							$values = [$value];
@@ -159,13 +158,13 @@ class IcalParser {
 						}
 
 					} else {
-						if (in_array($key, ['ORGANIZER'])) {
-							foreach ($middle as $midKey => $midVal) {
-								$this->data[$section][$this->counters[$section]][$key . '-' . $midKey] = $midVal;
+						if(in_array($key, ['ORGANIZER'])){
+							foreach($middle as $midKey => $midVal){
+								$this->data[$section][$this->counters[$section]][$key.'-'.$midKey] = $midVal;
 							}
 						}
-						if (in_array($key, ['ATTENDEE', 'ORGANIZER'])) {
-							$value = $value['VALUE'];    // backwards compatibility (leaves ATTENDEE entry as it was)
+						if(in_array($key, ['ATTENDEE', 'ORGANIZER'])){
+							$value = $value['VALUE'];		// backwards compatibility (leaves ATTENDEE entry as it was)
 						}
 						$this->data[$section][$this->counters[$section]][$key] = $value;
 					}
@@ -224,27 +223,6 @@ class IcalParser {
 		date_default_timezone_set($event['DTSTART']->getTimezone()->getName());
 		$frequency = new Freq($recurring->rrule, $event['DTSTART']->getTimestamp(), $exclusions, $additions);
 		$recurrenceTimestamps = $frequency->getAllOccurrences();
-
-		// This should be fixed in the Freq class, but it's too messy to make sense of
-		// This guard only works on WEEKLY, because the others have no fixed time interval
-		// There may still be a bug with the others
-		if (isset($event['RRULE']['INTERVAL']) && $recurring->getFreq() === "WEEKLY") {
-			$replacementList = [];
-
-			foreach($recurrenceTimestamps as $timestamp) {
-				$tmp = new DateTime('now', $event['DTSTART']->getTimezone());
-				$tmp->setTimestamp($timestamp);
-
-				$dayCount = $event['DTSTART']->diff($tmp)->format('%a');
-
-				if ($dayCount % ($event['RRULE']['INTERVAL'] * 7) == 0) {
-					$replacementList[] = $timestamp;
-				}
-			}
-
-			$recurrenceTimestamps = $replacementList;
-		}
-
 		$recurrences = [];
 		foreach ($recurrenceTimestamps as $recurrenceTimestamp) {
 			$tmp = new DateTime('now', $event['DTSTART']->getTimezone());
@@ -355,7 +333,7 @@ class IcalParser {
 			'LOCATION', 'RESOURCES', 'STATUS', 'SUMMARY', 'TRANSP', 'TZID', 'TZNAME', 'CONTACT',
 			'RELATED-TO', 'UID', 'ACTION', 'REQUEST-STATUS', 'URL',
 		];
-		if (in_array($key, $text_properties, true) || str_starts_with($key, 'X-')) {
+		if (in_array($key, $text_properties, true) || strpos($key, 'X-') === 0) {
 			if (is_array($value)) {
 				foreach ($value as &$var) {
 					$var = strtr($var, ['\\\\' => '\\', '\\N' => "\n", '\\n' => "\n", '\\;' => ';', '\\,' => ',']);
@@ -364,8 +342,8 @@ class IcalParser {
 				$value = strtr($value, ['\\\\' => '\\', '\\N' => "\n", '\\n' => "\n", '\\;' => ';', '\\,' => ',']);
 			}
 		}
-
-		if (in_array($key, ['ATTENDEE', 'ORGANIZER'])) {
+		
+		if(in_array($key, ['ATTENDEE', 'ORGANIZER'])){
 			$value = array_merge(is_array($middle) ? $middle : ['middle' => $middle], ['VALUE' => $value]);
 		}
 
@@ -378,7 +356,7 @@ class IcalParser {
 	 * @param string $zone
 	 * @return mixed|null
 	 */
-	private function toTimezone(string $zone): mixed {
+	private function toTimezone(string $zone) {
 		return $this->windowsTimezones[$zone] ?? $zone;
 	}
 
@@ -411,7 +389,7 @@ class IcalParser {
 	 *
 	 * @deprecated use IcalParser::getEvents()->sorted() instead
 	 */
-	public function getSortedEvents(): ArrayObject {
+	public function getSortedEvents(): \ArrayObject {
 		return $this->getEvents()->sorted();
 	}
 
@@ -425,14 +403,14 @@ class IcalParser {
 					if (!empty($event['RECURRENCE-ID']) && !empty($event['UID']) && isset($event['SEQUENCE'])) {
 						$modifiedEventUID = $event['UID'];
 						$modifiedEventRecurID = $event['RECURRENCE-ID'];
-						$modifiedEventSeq = (int) $event['SEQUENCE'];
+						$modifiedEventSeq = (int)$event['SEQUENCE'];
 
 						if (isset($this->data['_RECURRENCE_COUNTERS_BY_UID'][$modifiedEventUID])) {
 							$counter = $this->data['_RECURRENCE_COUNTERS_BY_UID'][$modifiedEventUID];
 
 							$originalEvent = $this->data['VEVENT'][$counter];
 							if (isset($originalEvent['SEQUENCE'])) {
-								$originalEventSeq = (int) $originalEvent['SEQUENCE'];
+								$originalEventSeq = (int)$originalEvent['SEQUENCE'];
 								$originalEventFormattedStartDate = $originalEvent['DTSTART']->format('Ymd\THis');
 								if ($modifiedEventRecurID === $originalEventFormattedStartDate && $modifiedEventSeq > $originalEventSeq) {
 									// this modifies the original event
@@ -495,7 +473,7 @@ class IcalParser {
 	 * @return \ArrayObject
 	 * @deprecated use IcalParser::getEvents->reversed();
 	 */
-	public function getReverseSortedEvents(): ArrayObject {
+	public function getReverseSortedEvents(): \ArrayObject {
 		return $this->getEvents()->reversed();
 	}
 

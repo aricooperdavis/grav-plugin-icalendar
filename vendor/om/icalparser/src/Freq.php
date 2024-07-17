@@ -36,9 +36,6 @@ use Exception;
  */
 class Freq {
 
-	/** @var bool */
-	public static bool $debug = false;
-
 	protected array $weekdays = [
 		'MO' => 'monday',
 		'TU' => 'tuesday',
@@ -68,18 +65,18 @@ class Freq {
 	protected array $excluded; //EXDATE
 	protected array $added;    //RDATE
 
-	protected array $cache; // getAllOccurrences()
+	protected $cache; // getAllOccurrences()
 
 	/**
 	 * Constructs a new Frequency-rule
 	 *
-	 * @param array|string $rule
+	 * @param string|array $rule
 	 * @param int $start Unix-timestamp (important : Need to be the start of Event)
 	 * @param array $excluded of int (timestamps), see EXDATE documentation
 	 * @param array $added of int (timestamps), see RDATE documentation
 	 * @throws Exception
 	 */
-	public function __construct(array|string $rule, int $start, array $excluded = [], array $added = []) {
+	public function __construct($rule, int $start, array $excluded = [], array $added = []) {
 		$this->start = $start;
 		$this->excluded = [];
 
@@ -192,7 +189,7 @@ class Freq {
 	 * @return int|bool
 	 * @throws Exception
 	 */
-	public function findNext(int $offset): bool|int {
+	public function findNext(int $offset) {
 		if (!empty($this->cache)) {
 			foreach ($this->cache as $ts) {
 				if ($ts > $offset) {
@@ -201,9 +198,11 @@ class Freq {
 			}
 		}
 
+		$debug = false;
+
 		//make sure the offset is valid
 		if ($offset === false || (isset($this->rules['until']) && $offset > $this->rules['until'])) {
-			if (static::$debug) printf("STOP: %s\n", date('r', $offset));
+			if ($debug) printf("STOP: %s\n", date('r', $offset));
 			return false;
 		}
 
@@ -211,11 +210,15 @@ class Freq {
 
 		//set the timestamp of the offset (ignoring hours and minutes unless we want them to be
 		//part of the calculations.
-		if (static::$debug) printf("O: %s\n", date('r', $offset));
-		$hour = (in_array($this->freq, ['hourly', 'minutely']) && $offset>$this->start) ? date('H', $offset) : date('H', $this->start);
-		$minute = (($this->freq === 'minutely' || isset($this->rules['byminute'])) && $offset > $this->start) ? date('i', $offset) : date('i', $this->start);
+		if ($debug) printf("O: %s\n", date('r', $offset));
+		$hour = (in_array($this->freq, ['hourly', 'minutely']) && $offset > $this->start) ? date('H', $offset) : date(
+			'H', $this->start
+		);
+		$minute = (($this->freq === 'minutely' || isset($this->rules['byminute'])) && $offset > $this->start) ? date(
+			'i', $offset
+		) : date('i', $this->start);
 		$t = mktime($hour, $minute, date('s', $this->start), date('m', $offset), date('d', $offset), date('Y', $offset));
-		if (static::$debug) printf("START: %s\n", date('r', $t));
+		if ($debug) printf("START: %s\n", date('r', $t));
 
 		if ($this->simpleMode) {
 			if ($offset < $t) {
@@ -242,7 +245,7 @@ class Freq {
 		$eop = $eopO->getTimestamp();
 		unset($eopO, $tO);
 
-		if (static::$debug) {
+		if ($debug) {
 			echo 'EOP: ' . date('r', $eop) . "\n";
 		}
 		foreach ($this->knownRules as $rule) {
@@ -255,7 +258,7 @@ class Freq {
 						if ($imm === false) {
 							break;
 						}
-						if (static::$debug) {
+						if ($debug) {
 							printf("%s: %s A: %d\n", strtoupper($rule), date('r', $imm), intval($imm > $offset && $imm < $eop));
 						}
 						if ($imm > $offset && $imm <= $eop && ($_t == null || $imm < $_t)) {
@@ -275,14 +278,14 @@ class Freq {
 			$ts = $this->start;
 		} elseif ($found && ($t != $offset)) {
 			if ($this->validDate($t)) {
-				if (static::$debug) echo 'OK' . "\n";
+				if ($debug) echo 'OK' . "\n";
 				$ts = $t;
 			} else {
-				if (static::$debug) echo 'Invalid' . "\n";
+				if ($debug) echo 'Invalid' . "\n";
 				$ts = $this->findNext($t);
 			}
 		} else {
-			if (static::$debug) echo 'Not found' . "\n";
+			if ($debug) echo 'Not found' . "\n";
 			$ts = $this->findNext($this->findStartingPoint($offset, $this->rules['interval']));
 		}
 		if ($ts && in_array($ts, $this->excluded, true)) {
@@ -301,7 +304,7 @@ class Freq {
 	 * @param boolean $truncate
 	 * @return int
 	 */
-	private function findStartingPoint(int $offset, int $interval, bool $truncate = true): int {
+	private function findStartingPoint(int $offset, int $interval, $truncate = true): int {
 		$_freq = ($this->freq === 'daily') ? 'day__' : $this->freq;
 		$t = '+' . $interval . ' ' . substr($_freq, 0, -2) . 's';
 		if ($_freq === 'monthly' && $truncate) {
@@ -414,7 +417,7 @@ class Freq {
 	 * @param int $offset
 	 * @return int
 	 */
-	public function findEndOfPeriod(int $offset = 0): int {
+	public function findEndOfPeriod($offset = 0) {
 		return $this->findStartingPoint($offset, 1, false);
 	}
 
@@ -426,7 +429,7 @@ class Freq {
 	 * @return int
 	 * @throws Exception
 	 */
-	public function previousOccurrence(int $offset): bool|int {
+	public function previousOccurrence(int $offset) {
 		if (!empty($this->cache)) {
 			$t2 = $this->start;
 			foreach ($this->cache as $ts) {
@@ -455,7 +458,7 @@ class Freq {
 	 * @return int
 	 * @throws Exception
 	 */
-	public function nextOccurrence(int $offset): bool|int {
+	public function nextOccurrence(int $offset) {
 		if ($offset < $this->start) {
 			return $this->firstOccurrence();
 		}
@@ -468,7 +471,7 @@ class Freq {
 	 * @return int timestamp
 	 * @throws Exception
 	 */
-	public function firstOccurrence(): bool|int {
+	public function firstOccurrence() {
 		$t = $this->start;
 		if (in_array($t, $this->excluded)) {
 			$t = $this->findNext($t);
@@ -484,7 +487,7 @@ class Freq {
 	 * @return int timestamp
 	 * @throws Exception
 	 */
-	public function lastOccurrence(): int {
+	public function lastOccurrence() {
 		//build cache if not done
 		$this->getAllOccurrences();
 		//return last timestamp in cache
@@ -497,7 +500,7 @@ class Freq {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getAllOccurrences(): array {
+	public function getAllOccurrences() {
 		if (empty($this->cache)) {
 			$cache = [];
 
@@ -573,7 +576,7 @@ class Freq {
 		}
 	}
 
-	private function ruleByMonth($rule, int $t): bool|int {
+	private function ruleByMonth($rule, int $t) {
 		$_t = mktime(date('H', $t), date('i', $t), date('s', $t), $rule, date('d', $t), date('Y', $t));
 		if ($t == $_t && isset($this->rules['byday'])) {
 			// TODO: this should check if one of the by*day's exists, and have a multi-day value
@@ -583,7 +586,7 @@ class Freq {
 		}
 	}
 
-	private function ruleByMonthday($rule, int $t): bool|int {
+	private function ruleByMonthday($rule, int $t) {
 		if ($rule < 0) {
 			$rule = date('t', $t) + $rule + 1;
 		}
@@ -591,7 +594,7 @@ class Freq {
 		return mktime(date('H', $t), date('i', $t), date('s', $t), date('m', $t), $rule, date('Y', $t));
 	}
 
-	private function ruleByYearday($rule, int $t): bool|int {
+	private function ruleByYearday($rule, int $t) {
 		if ($rule < 0) {
 			$_t = $this->findEndOfPeriod();
 			$d = '-';
@@ -604,7 +607,7 @@ class Freq {
 		return strtotime($s, $_t);
 	}
 
-	private function ruleByWeekno($rule, int $t): bool|int {
+	private function ruleByWeekno($rule, int $t) {
 		if ($rule < 0) {
 			$_t = $this->findEndOfPeriod();
 			$d = '-';
@@ -620,11 +623,11 @@ class Freq {
 		return $_t;
 	}
 
-	private function ruleByHour($rule, int $t): bool|int {
+	private function ruleByHour($rule, int $t) {
 		return mktime($rule, date('i', $t), date('s', $t), date('m', $t), date('d', $t), date('Y', $t));
 	}
 
-	private function ruleByMinute($rule, int $t): bool|int {
+	private function ruleByMinute($rule, int $t) {
 		return mktime(date('h', $t), $rule, date('s', $t), date('m', $t), date('d', $t), date('Y', $t));
 	}
 }
