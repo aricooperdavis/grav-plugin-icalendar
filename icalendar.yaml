@@ -1,5 +1,5 @@
 enabled: true
 icsurl: https://example.com/example.ics
-numevents: 2
-dateformat: d.m.Y
+numevents: 5
+dateformat: d.m.Y @ H:i
 

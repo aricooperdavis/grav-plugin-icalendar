@@ -14,6 +14,6 @@
     }],
     "require": {
         "php": ">=7.3",
-        "om/icalparser": "^3.0"
+        "om/icalparser": "3.0.4"
     }
 }

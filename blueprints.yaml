@@ -1,5 +1,5 @@
 name: Icalendar
-version: 0.3.0
+version: 0.3.1
 description: Fetches events from remote ICS file and displays them in a list.
 icon: calendar
 author:
@@ -30,6 +30,7 @@ form:
       validate:
         type: number
         min: 1
+      default: 5
     icsurl:
         type: text
         label: PLUGIN_ICALENDAR.ICSURL
@@ -39,4 +40,4 @@ form:
     dateformat:
         type: text
         label: PLUGIN_ICALENDAR.DATEFORMAT
-        default: d.m.Y
+        default: d.m.Y @ H:i

@@ -81,7 +81,7 @@ class IcalendarPlugin extends Plugin
 				$eventDesc = $event['DESCRIPTION'] ?? '';
 
 				// Append event to string
-				$eventList .= "<li>{$eventDate} - {$eventUrl}{$eventDesc}</li>";
+				$eventList .= "<li title='{$eventDesc}'>{$eventDate} - {$eventUrl}{$eventSummary}</li>";
 				$eventCount++;
 			}
 

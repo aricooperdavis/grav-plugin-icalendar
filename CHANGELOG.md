@@ -1,3 +1,11 @@
+# v0.3.1
+## 07/17/2024
+
+1. [](#improved)
+    * Bugfix: event description now shown on hover
+    * Better defaults for Event list
+    * Pinned dependency version for improved PHP backward compatability
+
 # v0.3.0
 ## 07/17/2024
 
