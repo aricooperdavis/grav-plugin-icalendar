@@ -1,3 +1,9 @@
+# v0.3.0
+## 07/17/2024
+
+1. [](#improved)
+    * Changed behaviour from reading local file to reading from ics URL
+
 # v0.2.5
 ##  04/10/2021
 

@@ -1,14 +1,14 @@
 name: Icalendar
-version: 0.2.5
-description: Reads ICS Files and shows Events from it
+version: 0.3.0
+description: Fetches events from remote ICS file and displays them in a list.
 icon: calendar
 author:
-  name: Werner Joss
-  email: wernerjoss@users.noreply.github.com
-homepage: https://github.com/wernerjoss/grav-plugin-icalendar
+  name: Ari Cooper-Davis
+  email: aricooperdavis@users.noreply.github.com
+homepage: https://github.com/aricooperdavis/grav-plugin-icalendar
 keywords: grav, plugin, ICS, Icalendar
-bugs: https://github.com/wernerjoss/grav-plugin-icalendar/issues
-docs: https://github.com/wernerjoss/grav-plugin-icalendar/blob/master/README.md
+bugs: https://github.com/aricooperdavis/grav-plugin-icalendar/issues
+docs: https://github.com/aricooperdavis/grav-plugin-icalendar/blob/master/README.md
 license: MIT
 
 form:
@@ -26,18 +26,17 @@ form:
         type: bool
     numevents:
       type: text
-      label: Number of Events to show
+      label: PLUGIN_ICALENDAR.NUMEVENTS
       validate:
         type: number
         min: 1
-    icsfile:
-        type: file
-        label: ICAL Calendar File
-        multiple: false
-        destination: 'user/data/calendars'
-        accept:
-            - .ics
+    icsurl:
+        type: text
+        label: PLUGIN_ICALENDAR.ICSURL
+        validate:
+          type: url
+        default: https://example.com/example.ics
     dateformat:
         type: text
-        label: Date Format
+        label: PLUGIN_ICALENDAR.DATEFORMAT
         default: d.m.Y

@@ -7,6 +7,8 @@ namespace Composer\Autoload;
 class ComposerStaticInitf61809d26a9e3f5a30c5384656db6ad0
 {
     public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'om\\EventsList' => __DIR__ . '/..' . '/om/icalparser/src/EventsList.php',
         'om\\Freq' => __DIR__ . '/..' . '/om/icalparser/src/Freq.php',
         'om\\IcalParser' => __DIR__ . '/..' . '/om/icalparser/src/IcalParser.php',
         'om\\Recurrence' => __DIR__ . '/..' . '/om/icalparser/src/Recurrence.php',

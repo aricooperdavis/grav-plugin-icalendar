@@ -1,4 +1,5 @@
 en:
   PLUGIN_ICALENDAR:
-    NUMEVENTS: Text Variable
-    NUMEVENTS_HELP: Text to add to the top of a page
+    NUMEVENTS: Number of Events to show
+    ICSURL: iCal file URL
+    DATEFORMAT: Date Format

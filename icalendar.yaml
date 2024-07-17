@@ -1,5 +1,5 @@
 enabled: true
-#icsfile is relative to user/data/calendars !
-icsfile: example.ics
+icsurl: https://example.com/example.ics
 numevents: 2
+dateformat: d.m.Y
 

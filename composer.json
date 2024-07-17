@@ -14,11 +14,6 @@
     }],
     "require": {
         "php": ">=7.3",
-        "om/icalparser": "^1.0"
-    },
-    "config": {
-        "platform": {
-            "php": "7.3"
-        }
+        "om/icalparser": "^3.0"
     }
 }
